@@ -1,5 +1,5 @@
 import express from "express"
-import { setWorkinghours, updateWorkingHours } from "../controllers/workingHours.controller.js"
+import { setWorkinghours, updateWorkingHours } from "../controllers/workinghours.controller.js"
 import { employeeAuth } from "../middlewares/auth.js"
 
 const router = express.Router()
