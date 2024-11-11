@@ -263,41 +263,43 @@ export const getTimeSlot = catchAsyncError(async (req, res, next) => {
 
         }
     }
+    // if (date.split('T')[0] === new Date(Date.now()).toISOString().split('T')[0]) {
 
-    if (date.split('T')[0] === new Date(Date.now()).toISOString().split('T')[0]) {
+    //     // const localTimeInIST = getLocalTimeInISTFormat();
 
-        // const localTimeInIST = getLocalTimeInISTFormat();
+    //     // console.log(localTimeInIST, intervals[0], new Date(Date.now()).toISOString())
 
-        // console.log(localTimeInIST, intervals[0], new Date(Date.now()).toISOString())
+    //     intervals = intervals.filter((i) => i > new Date(Date.now()).toISOString())
+    // }
 
-        intervals = intervals.filter((i) => i > new Date(Date.now()).toISOString())
-    }
+    // console.log(intervals)
+
 
     if (intervals.length === 0) return next(new ErrorHandler("No slots available", 400))
 
-    const slots = {
-        morning: [],
-        afternoon: [],
-        evening: [],
-        night: []
-    };
+    // const slots = {
+    //     morning: [],
+    //     afternoon: [],
+    //     evening: [],
+    //     night: []
+    // };
 
-    intervals.forEach((utcDateString) => {
-        const date = new Date(utcDateString);
-        const localHour = date.getHours(); // getHours() gives local time in the user's time zone
+    // intervals.forEach((utcDateString) => {
+    //     const date = new Date(utcDateString);
+    //     const localHour = date.getHours(); // getHours() gives local time in the user's time zone
 
-        if (localHour >= 3 && localHour < 12) {
-            slots.morning.push(utcDateString);
-        } else if (localHour >= 12 && localHour < 16) {
-            slots.afternoon.push(utcDateString);
-        } else if (localHour >= 16 && localHour < 18) {
-            slots.evening.push(utcDateString);
-        } else if (localHour >= 18 && localHour <= 23) {
-            slots.night.push(utcDateString);
-        }
-    });
+    //     if (localHour >= 3 && localHour < 12) {
+    //         slots.morning.push(utcDateString);
+    //     } else if (localHour >= 12 && localHour < 16) {
+    //         slots.afternoon.push(utcDateString);
+    //     } else if (localHour >= 16 && localHour < 18) {
+    //         slots.evening.push(utcDateString);
+    //     } else if (localHour >= 18 && localHour <= 23) {
+    //         slots.night.push(utcDateString);
+    //     }
+    // });
 
-    return res.status(200).json(new ApiResponse(200, intervals ? { slots, noOfSlots: intervals.length } : {}, intervals ? "" : "No timeslots available"))
+    return res.status(200).json(new ApiResponse(200, intervals ? { intervals, noOfSlots: intervals.length } : {}, intervals ? "" : "No timeslots available"))
 
 })
 
