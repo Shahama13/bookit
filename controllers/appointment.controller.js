@@ -374,16 +374,16 @@ export const getEmployeeApptsOfEveryInternal = catchAsyncError(async (req, res, 
         }
     }).populate(['review', 'bookedBy', 'employee', 'apptFor']);
 
-    const apptAll = await Appointment.find({
-        employee: empId,
-    }).populate(['review', 'bookedBy', 'employee', 'apptFor']);
+    // const apptAll = await Appointment.find({
+    //     employee: empId,
+    // }).populate(['review', 'bookedBy', 'employee', 'apptFor']);
 
     // Sorting
     apptToday.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
     apptWeek.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
     apptMonth.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
     apptYear.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
-    apptAll.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+    // apptAll.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
 
     // Response
     return res.status(201).json(new ApiResponse(201, {
@@ -391,9 +391,35 @@ export const getEmployeeApptsOfEveryInternal = catchAsyncError(async (req, res, 
         week: apptWeek.reverse(),
         month: apptMonth.reverse(),
         year: apptYear.reverse(),
-        all: apptAll.reverse(),
+        // all: apptAll.reverse(),
     }, " "));
 
+})
+
+export const getEmployeeApptOfDate = catchAsyncError(async (req, res, next) => {
+    const { date } = req.body
+    const startTimeAtMid = new Date(date);
+    startTimeAtMid.setUTCHours(0, 0, 0, 0);
+    const endTimeAtMid = new Date(startTimeAtMid);
+    endTimeAtMid.setUTCHours(23, 59, 59, 999);
+    const appt = await Appointment.find({
+        employee: req.params.empId,
+        startTime: {
+            $gte: startTimeAtMid,
+            $lt: endTimeAtMid
+        }
+    }).populate([
+        { path: "bookedBy", select: "avatar fullname email" },
+        { path: "apptFor", select: "name durationInminutes imageUrl special" },
+        { path: "review", select: "rating comment" }
+    ])
+
+    // populate(['review', 'bookedBy', 'employee', 'apptFor']).select({
+    // });
+    appt?.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+    return res.status(200).json(new ApiResponse(201, {
+        appt,
+    }, " "));
 })
 
 export const cancelAppointment = catchAsyncError(async (req, res, next) => {
@@ -434,7 +460,7 @@ export const markApptasCompleted = catchAsyncError(async (req, res, next) => {
     if (appointment.status !== "Booked") return next(new ErrorHandler("Action not possible", 400))
     appointment.status = "Completed"
     await appointment.save()
-    return res.status(200).json(new ApiResponse(200, appointment, "Appointment marked as complete"))
+    return res.status(200).json(new ApiResponse(200, appointment, "Appointment marked complete"))
 })
 
 export const cancelAppointmentofUserByEmployee = catchAsyncError(async (req, res, next) => {
@@ -453,6 +479,5 @@ export const cancelAppointmentofUserByEmployee = catchAsyncError(async (req, res
     appointment.status = "Cancelled"
     appointment.cancelReason = cancelReason
     await appointment.save()
-
-    return res.status(200).json(new ApiResponse(200, appointment, "Appointment marked as complete"))
+    return res.status(200).json(new ApiResponse(200, appointment, "Appointment cancelled"))
 })

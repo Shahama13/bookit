@@ -22,11 +22,21 @@ export const setWorkinghours = catchAsyncError(async (req, res, next) => {
     return res.status(200).json(new ApiResponse(200, workingHours, "Working Hours created"))
 })
 
+export const getWorkinghours = catchAsyncError(async (req, res, next) => {
+    const { id } = req.params;
+
+    const workingHours = await Workinghours.findOne({ employee: id })
+
+    if (!workingHours) return next(new ErrorHandler("Set your working hours", 404))
+
+    return res.status(200).json(new ApiResponse(200, workingHours, ""))
+})
+
 export const updateWorkingHours = catchAsyncError(async (req, res, next) => {
     const { id } = req.params
     const updatedHours = req.body
     const updatedWorkingHours = await Workinghours.findByIdAndUpdate(id, updatedHours, { new: true });
     if (!updatedWorkingHours) return next(new ErrorHandler("Working hours not found", 404))
-    return res.status(200).json(new ApiResponse(200, updatedWorkingHours, "Working hours not found"));
+    return res.status(200).json(new ApiResponse(200, updatedWorkingHours, "Working hours updated"));
 })
 

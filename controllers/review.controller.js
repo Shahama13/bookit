@@ -46,7 +46,8 @@ export const rateAppointment = catchAsyncError(async (req, res, next) => {
 })
 
 export const getEmployeesReview = catchAsyncError(async (req, res, next) => {
-    const reviews = await Review.find({ employee: req.employee._id }).populate("user")
+    const reviews = await Review.find({ employee: req.params.id }).populate({path:"user", select:"avatar fullname email"})
+    if (!reviews) return next(new ErrorHandler("No reviews yet", 400))
     return res.status(201).json(new ApiResponse(201, reviews?.reverse(), ""))
 })
 

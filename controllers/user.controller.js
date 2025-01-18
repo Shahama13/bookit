@@ -219,7 +219,6 @@ export const changeAvatar = catchAsyncError(async (req, res, next) => {
     console.log(req.body.fullname)
     // if (req.files === undefined) return next(new ErrorHandler("Upload image", 400))
     if (req.files !== null) {
-        console.log("in avatar")
         if (user.avatar?.public_id) await cloudinary.v2.uploader.destroy(user.avatar.public_id)
         const avatar = req.files.avatar.tempFilePath;
         const myCloud = await cloudinary.v2.uploader.upload(avatar, {
@@ -231,7 +230,7 @@ export const changeAvatar = catchAsyncError(async (req, res, next) => {
             url: myCloud.secure_url
         }
     }
-    if (req.body.fullname) { console.log("in fullname"); user.fullname = req.body.fullname }
+    if (req.body.fullname) { user.fullname = req.body.fullname }
     await user.save()
     return res.status(200).json(new ApiResponse(200, user, "Profile changed"))
 })

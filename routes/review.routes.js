@@ -5,6 +5,6 @@ import { rateAppointment, getEmployeesReview } from "../controllers/review.contr
 const router = express.Router()
 
 router.route("/:id").post(userAuth, rateAppointment)
-router.route("/my").get(employeeAuth, getEmployeesReview)
+router.route("/my/:id").get( getEmployeesReview)
 
 export default router

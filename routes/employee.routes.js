@@ -30,7 +30,7 @@ router.route("/logout").get(employeeAuth, logoutEmployee)
 router.route("/forgot-password").post(sendResetPasswordMail)
 router.route("/reset-password").post(resetPassword)
 router.route("/change-password").post(employeeAuth, changeCurrentPassword)
-router.route("/change-avatar").post(employeeAuth, changeAvatar)
+router.route("/change-profile").post(employeeAuth, changeAvatar)
 
 router.route("/all").get(getAllEmployees)
 router.route("/:id").get(empById).delete(userAuth, adminauth, deleteEmployee).patch(userAuth, adminauth, updateEmployee)

@@ -168,7 +168,7 @@ export const sendResetPasswordMail = catchAsyncError(async (req, res, next) => {
     if (!email) return next(new ErrorHandler("Enter email", 400))
     const employee = await Employee.findOne({ email })
     if (!employee) return next(new ErrorHandler("User not found", 404))
-    const resetOTP = Math.floor(1000 + (9999 - 1000) * Math.random())
+    const resetOTP = Math.floor(100000 + (999999 - 100000) * Math.random())
     employee.resetPasswordOTP = resetOTP
     employee.resetPasswordExpiry = Date.now() + 15 * 60 * 1000
     await employee.save()
@@ -205,17 +205,22 @@ export const changeCurrentPassword = catchAsyncError(async (req, res, next) => {
 export const changeAvatar = catchAsyncError(async (req, res, next) => {
 
     const employee = await Employee.findById(req.employee._id)
-    if (employee.avatar?.public_id) await cloudinary.v2.uploader.destroy(employee.avatar.public_id)
-    if (req.files === undefined) return next(new ErrorHandler("Upload image", 400))
-    const avatar = req.files.avatar.tempFilePath;
-    const myCloud = await cloudinary.v2.uploader.upload(avatar, {
-        folder: "Appointment"
-    })
-    fs.rmSync("./tmp", { recursive: true })
-    employee.avatar = {
-        public_id: myCloud.public_id,
-        url: myCloud.secure_url
+
+    if (req.files !== null) {
+        if (employee.avatar?.public_id) await cloudinary.v2.uploader.destroy(employee.avatar.public_id)
+        // if (req.files === undefined) return next(new ErrorHandler("Upload image", 400))
+        const avatar = req.files.avatar.tempFilePath;
+        const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+            folder: "Appointment"
+        })
+        fs.rmSync("./tmp", { recursive: true })
+        employee.avatar = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url
+        }
     }
+    if (req.body.fullname) { employee.fullname = req.body.fullname }
+    if (req.body.description) { employee.description = req.body.description }
     await employee.save()
     return res.status(200).json(new ApiResponse(200, employee, "Profile changed"))
 })

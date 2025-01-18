@@ -2,6 +2,7 @@ import { Schema, model } from "mongoose";
 
 const categorySchema = new Schema({
     name: String,
+    description: String,
     professionals: [{
         type: Schema.Types.ObjectId,
         ref: "Employee",
