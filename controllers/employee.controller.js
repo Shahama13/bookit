@@ -16,7 +16,9 @@ export const registerEmployee = catchAsyncError(async (req, res, next) => {
     const { fullname, email, password, description, speciality } = req.body;
     // check if any exisiting users
     if (!fullname || !email || !password || !description || req.files === undefined) return next(new ErrorHandler("All fields required", 400))
-    const specialityArray = JSON.parse(speciality)
+    let specialityArray = []
+    if (speciality) { specialityArray = JSON.parse(speciality) }
+
     const temp = await User.findOne({ email })
     if (temp) return next(new ErrorHandler("User exists with this account", 400))
 
@@ -24,7 +26,7 @@ export const registerEmployee = catchAsyncError(async (req, res, next) => {
     if (employee) return next(new ErrorHandler("Employee already exists", 400))
 
     const existingUserByEmail = await Employee.findOne({ email });
-    const OTP = Math.floor(1000 + (9999 - 1000) * Math.random())
+    const OTP = Math.floor(100000 + (999999 - 100000) * Math.random())
     const avatar = req.files.avatar.tempFilePath;
 
     if (existingUserByEmail) {
@@ -58,12 +60,14 @@ export const registerEmployee = catchAsyncError(async (req, res, next) => {
                 url: myCloud.secure_url
             }
         })
-        specialityArray.forEach(async (element) => {
-            const category = await Category.findById(element);
-            if (!category) return next(new ErrorHandler("Category not found", 400))
-            if (!category.professionals.includes(employee._id)) { category.professionals.push(employee._id) }
-            await category.save()
-        });
+        if (speciality) {
+            specialityArray.forEach(async (element) => {
+                const category = await Category.findById(element);
+                if (!category) return
+                if (!category.professionals.includes(employee._id)) { category.professionals.push(employee._id) }
+                await category.save()
+            });
+        }
     }
 
     await sendEmail(email, "Verification OTP", `OTP to verify your email is ${OTP}`)
@@ -258,16 +262,51 @@ export const deleteEmployee = catchAsyncError(async (req, res, next) => {
 })
 
 export const updateEmployee = catchAsyncError(async (req, res, next) => {
-    const { fullname, description,
-        // speciality
-    } = req.body
-    if (Object.keys(req.body).length === 0) return next(new ErrorHandler("Empty request", 400))
-    const employee = await Employee.findById(req.params.id)
-    if (fullname) employee.fullname = fullname
-    if (description) employee.description = description
-    // if (speciality) employee.speciality = JSON.parse(speciality)
+    const { fullname, description, speciality } = req.body;
 
-    await employee.save()
+    if (Object.keys(req.body).length === 0) {
+        return next(new ErrorHandler("Empty request", 400));
+    }
 
-    return res.status(200).json(new ApiResponse(200, employee, 'Employee details updated successfully'))
-})
+    const employee = await Employee.findById(req.params.id);
+    if (!employee) {
+        return next(new ErrorHandler("Employee not found", 404));
+    }
+
+    if (fullname) employee.fullname = fullname;
+    if (description) employee.description = description;
+
+    if (speciality) {
+        const specialityArray = JSON.parse(speciality);
+        employee.speciality = specialityArray;
+
+        // Fetch all categories
+        const categories = await Category.find();
+
+        // Loop through each category and update professionals
+        for (const category of categories) {
+            const isEmployeeInCategory = specialityArray.includes(category._id.toString());
+
+            if (isEmployeeInCategory) {
+                // Add employee to category if not already present
+                if (!category.professionals.includes(employee._id)) {
+                    category.professionals.push(employee._id);
+                }
+            } else {
+                // Remove employee from category if present
+                const index = category.professionals.indexOf(employee._id);
+                if (index !== -1) {
+                    category.professionals.splice(index, 1);
+                }
+            }
+
+            // Save the category only once per iteration
+            await category.save();
+        }
+    }
+
+    // Save the employee document
+    await employee.save();
+
+    return res.status(200).json(new ApiResponse(200, employee, 'Employee details updated successfully'));
+});

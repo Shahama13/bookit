@@ -73,3 +73,11 @@ export const catById = catchAsyncError(async (req, res) => {
     res.status(200).json(new ApiResponse(200, { category, reviews }, ""))
 })
 
+export const updateCategory = catchAsyncError(async (req, res) => {
+    const { id } = req.params
+    const { name, imageUrl, durationInminutes } = req.body
+    const category = await Category.findByIdAndUpdate(id, { name, imageUrl, durationInminutes }, { new: true });
+    if (!category) return next(new ErrorHandler("Category not found", 404))
+    return res.status(200).json(new ApiResponse(200, {}, "Category updated"));
+})
+

@@ -303,95 +303,121 @@ export const getTimeSlot = catchAsyncError(async (req, res, next) => {
 
 })
 
-export const getEmployeeApptsOfEveryInternal = catchAsyncError(async (req, res, next) => {
+export const getApptsOfDate = catchAsyncError(async (req, res, next) => {
 
-    const { empId } = req.params
+    // const { empId } = req.params
 
-    const startTimeAtMid = new Date(Date.now());
-    startTimeAtMid.setUTCHours(0, 0, 0, 0);
+    // const startTimeAtMid = new Date(Date.now());
+    // startTimeAtMid.setUTCHours(0, 0, 0, 0);
 
-    const endTimeAtMid = new Date(Date.now());
-    endTimeAtMid.setUTCHours(23, 59, 59, 999);
+    // const endTimeAtMid = new Date(Date.now());
+    // endTimeAtMid.setUTCHours(23, 59, 59, 999);
 
     // Start and end of the week
-    const startOfWeek = new Date(startTimeAtMid);
-    startOfWeek.setUTCDate(startTimeAtMid.getUTCDate() - startTimeAtMid.getUTCDay());
-    startOfWeek.setUTCHours(0, 0, 0, 0);
+    // const startOfWeek = new Date(startTimeAtMid);
+    // startOfWeek.setUTCDate(startTimeAtMid.getUTCDate() - startTimeAtMid.getUTCDay());
+    // startOfWeek.setUTCHours(0, 0, 0, 0);
 
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 6);
-    endOfWeek.setUTCHours(23, 59, 59, 999);
+    // const endOfWeek = new Date(startOfWeek);
+    // endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 6);
+    // endOfWeek.setUTCHours(23, 59, 59, 999);
 
     // Start and end of the month
-    const startOfMonth = new Date(startTimeAtMid);
-    startOfMonth.setUTCDate(1);
-    startOfMonth.setUTCHours(0, 0, 0, 0);
+    // const startOfMonth = new Date(startTimeAtMid);
+    // startOfMonth.setUTCDate(1);
+    // startOfMonth.setUTCHours(0, 0, 0, 0);
 
-    const endOfMonth = new Date(startOfMonth);
-    endOfMonth.setUTCMonth(startOfMonth.getUTCMonth() + 1);
-    endOfMonth.setUTCDate(0); // Last day of the previous month
-    endOfMonth.setUTCHours(23, 59, 59, 999);
+    // const endOfMonth = new Date(startOfMonth);
+    // endOfMonth.setUTCMonth(startOfMonth.getUTCMonth() + 1);
+    // endOfMonth.setUTCDate(0); // Last day of the previous month
+    // endOfMonth.setUTCHours(23, 59, 59, 999);
 
     // Start and end of the year
-    const startOfYear = new Date(startTimeAtMid);
-    startOfYear.setUTCMonth(0, 1); // January 1st
-    startOfYear.setUTCHours(0, 0, 0, 0);
+    // const startOfYear = new Date(startTimeAtMid);
+    // startOfYear.setUTCMonth(0, 1); // January 1st
+    // startOfYear.setUTCHours(0, 0, 0, 0);
 
-    const endOfYear = new Date(startOfYear);
-    endOfYear.setUTCMonth(11, 31); // December 31st
-    endOfYear.setUTCHours(23, 59, 59, 999);
+    // const endOfYear = new Date(startOfYear);
+    // endOfYear.setUTCMonth(11, 31); // December 31st
+    // endOfYear.setUTCHours(23, 59, 59, 999);
 
     // Fetching appointments
-    const apptToday = await Appointment.find({
-        employee: empId,
-        startTime: {
-            $gte: startTimeAtMid,
-            $lt: endTimeAtMid
-        }
-    }).populate(['review', 'bookedBy', 'employee', 'apptFor']);
+    // const apptToday = await Appointment.find({
+    //     // employee: empId,
+    //     startTime: {
+    //         $gte: startTimeAtMid,
+    //         $lt: endTimeAtMid
+    //     }
+    // }).populate([
+    //     { path: "bookedBy", select: "avatar fullname email" },
+    //     { path: "employee", select: "avatar fullname email" },
+    //     { path: "apptFor", select: "name durationInminutes imageUrl special" },
+    //     { path: "review", select: "rating comment" }
+    // ]);
 
-    const apptWeek = await Appointment.find({
-        employee: empId,
-        startTime: {
-            $gte: startOfWeek,
-            $lt: endOfWeek
-        }
-    }).populate(['review', 'bookedBy', 'employee', 'apptFor']);
+    // const apptWeek = await Appointment.find({
+    //     // employee: empId,
+    //     startTime: {
+    //         $gte: startOfWeek,
+    //         $lt: endOfWeek
+    //     }
+    // }).populate(['review', 'bookedBy', 'employee', 'apptFor']);
 
-    const apptMonth = await Appointment.find({
-        employee: empId,
-        startTime: {
-            $gte: startOfMonth,
-            $lt: endOfMonth
-        }
-    }).populate(['review', 'bookedBy', 'employee', 'apptFor']);
+    // const apptMonth = await Appointment.find({
+    //     // employee: empId,
+    //     startTime: {
+    //         $gte: startOfMonth,
+    //         $lt: endOfMonth
+    //     }
+    // }).populate(['review', 'bookedBy', 'employee', 'apptFor']);
 
-    const apptYear = await Appointment.find({
-        employee: empId,
-        startTime: {
-            $gte: startOfYear,
-            $lt: endOfYear
-        }
-    }).populate(['review', 'bookedBy', 'employee', 'apptFor']);
+    // const apptYear = await Appointment.find({
+    //     // employee: empId,
+    //     startTime: {
+    //         $gte: startOfYear,
+    //         $lt: endOfYear
+    //     }
+    // }).populate(['review', 'bookedBy', 'employee', 'apptFor']);
 
     // const apptAll = await Appointment.find({
     //     employee: empId,
     // }).populate(['review', 'bookedBy', 'employee', 'apptFor']);
 
     // Sorting
-    apptToday.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
-    apptWeek.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
-    apptMonth.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
-    apptYear.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+    // apptToday.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+    // apptWeek.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+    // apptMonth.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+    // apptYear.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
     // apptAll.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
 
     // Response
-    return res.status(201).json(new ApiResponse(201, {
-        today: apptToday,
-        week: apptWeek.reverse(),
-        month: apptMonth.reverse(),
-        year: apptYear.reverse(),
-        // all: apptAll.reverse(),
+    // return res.status(201).json(new ApiResponse(201, {
+    //     today: apptToday,
+    // week: apptWeek.reverse(),
+    // month: apptMonth.reverse(),
+    // year: apptYear.reverse(),
+    // all: apptAll.reverse(),
+    // }, " "));
+    const { date } = req.body
+    const startTimeAtMid = new Date(date);
+    startTimeAtMid.setUTCHours(0, 0, 0, 0);
+    const endTimeAtMid = new Date(startTimeAtMid);
+    endTimeAtMid.setUTCHours(23, 59, 59, 999);
+    const appt = await Appointment.find({
+        startTime: {
+            $gte: startTimeAtMid,
+            $lt: endTimeAtMid
+        }
+    }).populate([
+        { path: "bookedBy", select: "avatar fullname email" },
+        { path: "employee", select: "avatar fullname email" },
+        { path: "apptFor", select: "name durationInminutes imageUrl special" },
+        { path: "review", select: "rating comment" }
+    ])
+
+    appt?.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+    return res.status(200).json(new ApiResponse(201, {
+        appt,
     }, " "));
 
 })

@@ -4,7 +4,7 @@ import {
     bookAppointment,
     cancelAppointment,
     cancelAppointmentofUserByEmployee,
-    getEmployeeApptsOfEveryInternal,
+    getApptsOfDate,
     getUserApptHistory,
     markApptasCompleted,
     getTimeSlot,
@@ -19,7 +19,7 @@ router.route("/hist").get(userAuth, getUserApptHistory)
 router.route("/:id").get(apptById).delete(userAuth, cancelAppointment)
 router.route("/set/:id").get(employeeAuth, markApptasCompleted)
 router.route("/cancel/:id").post(employeeAuth, cancelAppointmentofUserByEmployee)
-router.route("/appt/:empId").get(getEmployeeApptsOfEveryInternal)
+router.route("/appt").post(getApptsOfDate)
 router.route("/appt/date/:empId").post(getEmployeeApptOfDate)
 router.route("/timeslot").post(getTimeSlot)
 

@@ -109,7 +109,7 @@ export const loginAdmin = catchAsyncError(async (req, res, next) => {
     if (!email || !password) return next(new ErrorHandler("Enter email and password", 400))
     const user = await User.findOne({ email }).select("+password")
     if (!user) return next(new ErrorHandler("User doesn't exist", 400))
-    if (user.role !== 'admin') return next(new ErrorHandler("Not an admin account", 400))
+    if (user.role !== 'admin') return next(new ErrorHandler("Unauthorized Access: You are not authorized to log in to the admin account.", 400))
     // if (!user.isVerified) return next(new ErrorHandler("Email unverified, verify to login or register again", 400))
     const isPasswordCorrect = await user.isPasswordCorrect(password)
     if (!isPasswordCorrect) return next(new ErrorHandler("Invalid credentials", 400))
